@@ -1,0 +1,24 @@
+# .gitleaks.toml — false-positive allowlist for viavitae-api
+#
+# Each entry below is a verified false positive: a synthetic test value that
+# matches a gitleaks rule pattern but is not a real credential. Adding an entry
+# here requires security team approval (rule R2 path: /.github/ → security).
+
+title = "viavitae-api gitleaks config"
+
+# Test fixtures that contain synthetic values resembling API keys.
+# These are committed test data, not real credentials.
+[[allowlists]]
+  description = "Test fixtures with synthetic idempotency keys"
+  paths = ['''tests/.*''']
+  regexes = [
+    '''idempotency_key.*test-''',
+  ]
+
+# The OpenAPI spec defines field schemas; example values are structural, not secrets.
+[[allowlists]]
+  description = "OpenAPI spec field definitions"
+  paths = ['''docs/api/.*''']
+  regexes = [
+    '''idempotency_key''',
+  ]

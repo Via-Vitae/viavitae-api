@@ -17,6 +17,6 @@ async def test_reservation_requires_a_strong_idempotency_key(client: AsyncClient
     assert bad.status_code == 422
     ok = await client.post(
         "/v1/gis/reservations",
-        json={"parcel_id": "p1", "idempotency_key": "0123456789abcdef"},
+        json={"parcel_id": "p1", "idempotency_key": "test-idempotency-key-not-a-real-secret-value"},
     )
     assert ok.status_code == 501
