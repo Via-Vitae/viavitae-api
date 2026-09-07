@@ -1,0 +1,56 @@
+name: Feature request
+description: Propose a new capability or an improvement
+title: "[feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or business problem does this solve? Who has it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behaviour, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - brand
+        - web
+        - api
+        - infra
+        - demos
+        - docs
+        - qa
+        - marketplace (jolarca)
+        - client tenants
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data protection impact
+      description: |
+        Which personal data would be processed, on which legal basis, where is
+        it stored, and is a DPIA required?
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I checked that no existing issue covers this
+          required: true
+        - label: The proposal keeps personal data inside the EEA
+          required: true

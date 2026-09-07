@@ -1,0 +1,82 @@
+# Local development and nightly E2E stack. Disposable dependencies only: no
+# production endpoints, no real data, and every published port is bound to
+# 127.0.0.1 so nothing is exposed on the host's external interfaces.
+#
+#   docker compose up -d --wait postgres redis api    # what CI/nightly drives
+#   docker compose --profile auth up keycloak         # opt-in identity experiments
+#
+# mailpit is the SMTP sink (UI on :8025). keycloak is gated behind the `auth`
+# profile because authentication is still stubbed in app/api/deps.py (X-Tenant
+# header); nothing connects to it yet.
+name: viavitae-api
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: ci
+      POSTGRES_PASSWORD: ci
+      POSTGRES_DB: viavitae_test
+    ports: ["127.0.0.1:5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ci -d viavitae_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    tmpfs: /var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    # Dev-only SMTP sink; never shipped to prod, so a floating tag is acceptable.
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1025:1025"  # SMTP
+      - "127.0.0.1:8025:8025"  # web UI
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://ci:ci@postgres:5432/viavitae_test
+      REDIS_URL: redis://redis:6379/0
+      SMTP_URL: smtp://mailpit:1025
+      ENVIRONMENT: dev
+      LOG_JSON: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    ports: ["127.0.0.1:8000:8000"]
+
+  keycloak:
+    # Opt-in (profile "auth"). Throwaway local admin credential; override via
+    # KEYCLOAK_ADMIN_PASSWORD. Never reuse for staging or production.
+    image: quay.io/keycloak/keycloak:26.0
+    profiles: ["auth"]
+    command: ["start-dev"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HEALTH_ENABLED: "true"
+    ports: ["127.0.0.1:8080:8080"]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/keycloak/bin/kc.sh health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12

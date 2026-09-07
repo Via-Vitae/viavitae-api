@@ -1,0 +1,144 @@
+# Scheduled jobs — demo reset, payment reconciliation, CRM follow-ups.
+#
+# All three are created with `suspend: true`. The worker modules under
+# app/workers currently expose *functions* (reset_tenant, run, plan), not CLI
+# entrypoints, so an unsuspended job would exit immediately and look like a
+# silent success. When each entrypoint lands, set suspend:false and confirm the
+# command. Schedules are UTC; reconciliation runs after the provider's daily cut.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: viavitae-demo-reset
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: cronjob
+    app.kubernetes.io/part-of: viavitae
+spec:
+  schedule: "0 2 * * *"
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: OnFailure
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: demo-reset
+              image: ghcr.io/Via-Vitae/viavitae-api:0.1.0
+              # TODO(workers): python -m app.workers.demo_reset --all
+              command: ["python", "-m", "app.workers.demo_reset"]
+              envFrom:
+                - secretRef:
+                    name: viavitae-api-secrets
+              resources:
+                requests: { cpu: 50m, memory: 128Mi }
+                limits: { cpu: 250m, memory: 512Mi }
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: viavitae-reconciliation
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: cronjob
+    app.kubernetes.io/part-of: viavitae
+spec:
+  schedule: "30 2 * * *"
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: reconciliation
+              image: ghcr.io/Via-Vitae/viavitae-api:0.1.0
+              # TODO(workers): python -m app.workers.reconciliation_worker --date yesterday
+              command: ["python", "-m", "app.workers.reconciliation_worker"]
+              envFrom:
+                - secretRef:
+                    name: viavitae-api-secrets
+              resources:
+                requests: { cpu: 50m, memory: 128Mi }
+                limits: { cpu: 250m, memory: 512Mi }
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: viavitae-followups
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: cronjob
+    app.kubernetes.io/part-of: viavitae
+spec:
+  schedule: "0 7 * * *"
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: OnFailure
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: followups
+              image: ghcr.io/Via-Vitae/viavitae-api:0.1.0
+              # TODO(workers): python -m app.workers.followups --due-today
+              command: ["python", "-m", "app.workers.followups"]
+              envFrom:
+                - secretRef:
+                    name: viavitae-api-secrets
+              resources:
+                requests: { cpu: 50m, memory: 128Mi }
+                limits: { cpu: 250m, memory: 512Mi }
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]

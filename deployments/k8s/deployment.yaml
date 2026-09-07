@@ -1,0 +1,174 @@
+# API Deployment — viavitae-api
+#
+# Consumed by viavitae-infra (Argo CD). The image tag is bumped by the GitOps
+# pipeline; everything else here is the service's own contract. Hardened for a
+# multi-tenant, GDPR-scoped workload: non-root, read-only root filesystem, all
+# capabilities dropped, seccomp RuntimeDefault, and probes wired to the app's
+# real health routes (/health/live, /health/ready).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: viavitae-api
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: viavitae
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: viavitae-api
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: viavitae-api
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: viavitae
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          # Argo CD image-updater rewrites this tag; the digest is promoted from
+          # staging to prod (see .github/workflows/deploy.yml).
+          image: ghcr.io/Via-Vitae/viavitae-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: ENVIRONMENT
+              value: prod
+            - name: LOG_JSON
+              value: "true"
+            - name: API_PREFIX
+              value: v1
+            - name: DEFAULT_LOCALE
+              value: lt
+            - name: PORT
+              value: "8000"
+          # All secrets (DATABASE_URL, REDIS_URL, provider keys) come from the
+          # ExternalSecret-managed Secret; none are inlined here.
+          envFrom:
+            - secretRef:
+                name: viavitae-api-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            # Writable scratch space under a read-only root filesystem.
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Worker Deployment — background queue consumer (RQ-style, custom Redis queue).
+#
+# Held at replicas: 0 on purpose: app/workers exposes job *definitions* but not a
+# consumer entrypoint yet (and `rq` is intentionally not a dependency). Raising
+# this to >=1 before that entrypoint exists would CrashLoopBackOff. Flip the
+# replicas and finalise `command` together with the first worker implementation.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: viavitae-api-worker
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: viavitae
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: viavitae-api
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: viavitae-api
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: viavitae
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: worker
+          image: ghcr.io/Via-Vitae/viavitae-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          # TODO(workers): point at the real consumer loop, e.g.
+          # ["python", "-m", "app.workers.queue"] once it blocks on the queue.
+          command: ["python", "-m", "app.workers.queue"]
+          env:
+            - name: ENVIRONMENT
+              value: prod
+          envFrom:
+            - secretRef:
+                name: viavitae-api-secrets
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

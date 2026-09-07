@@ -1,0 +1,1723 @@
+{
+  "components": {
+    "schemas": {
+      "AssessmentResult": {
+        "description": "The recommended tier and an indicative monthly price.",
+        "properties": {
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "indicative_monthly": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "recommended_tier": {
+            "title": "Recommended Tier",
+            "type": "string"
+          },
+          "score": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "score",
+          "recommended_tier",
+          "indicative_monthly"
+        ],
+        "title": "AssessmentResult",
+        "type": "object"
+      },
+      "AssessmentSubmit": {
+        "additionalProperties": false,
+        "description": "A completed funnel submission; contact data is minimised (DPIA-001).",
+        "properties": {
+          "congregation_size": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Congregation Size",
+            "type": "integer"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "locale": {
+            "default": "lt",
+            "pattern": "^(lt|en|ru|pl|de)$",
+            "title": "Locale",
+            "type": "string"
+          },
+          "parish": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Parish",
+            "type": "string"
+          },
+          "utm": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UtmParams"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "parish",
+          "congregation_size"
+        ],
+        "title": "AssessmentSubmit",
+        "type": "object"
+      },
+      "AuditEntry": {
+        "description": "One append-only entry in the approval audit trail.",
+        "properties": {
+          "decided_at": {
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decided_by": {
+            "title": "Decided By",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "decided_by",
+          "decision",
+          "decided_at"
+        ],
+        "title": "AuditEntry",
+        "type": "object"
+      },
+      "Citation": {
+        "description": "A retrieved source that grounds part of a draft.",
+        "properties": {
+          "document_title": {
+            "title": "Document Title",
+            "type": "string"
+          },
+          "excerpt": {
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "document_title",
+          "excerpt"
+        ],
+        "title": "Citation",
+        "type": "object"
+      },
+      "DonationCreate": {
+        "additionalProperties": false,
+        "description": "A one-off or recurring donation intent.",
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "donor_reference": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Donor Reference"
+          },
+          "fund": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fund"
+          },
+          "locale": {
+            "default": "lt",
+            "pattern": "^(lt|en|ru)$",
+            "title": "Locale",
+            "type": "string"
+          },
+          "recurring": {
+            "default": false,
+            "title": "Recurring",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "title": "DonationCreate",
+        "type": "object"
+      },
+      "DonationPage": {
+        "description": "A cursor-paginated page of donation records.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DonationRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "items",
+          "page"
+        ],
+        "title": "DonationPage",
+        "type": "object"
+      },
+      "DonationRecord": {
+        "description": "One donation as shown in the donor portal history.",
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "donation_id": {
+            "title": "Donation Id",
+            "type": "string"
+          },
+          "gpm_designation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "donation_id",
+          "amount",
+          "status",
+          "created_at"
+        ],
+        "title": "DonationRecord",
+        "type": "object"
+      },
+      "Draft": {
+        "description": "A draft with its citations and grounding coverage.",
+        "properties": {
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "coverage_ratio": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Coverage Ratio",
+            "type": "number"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "state": {
+            "pattern": "^(pending|approved|rejected|withdrawn|expired)$",
+            "title": "State",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "state",
+          "text",
+          "citations",
+          "coverage_ratio"
+        ],
+        "title": "Draft",
+        "type": "object"
+      },
+      "DraftCreate": {
+        "additionalProperties": false,
+        "description": "A request to queue a retrieval-grounded draft.",
+        "properties": {
+          "locale": {
+            "default": "lt",
+            "pattern": "^(lt|en|ru)$",
+            "title": "Locale",
+            "type": "string"
+          },
+          "prompt": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "DraftCreate",
+        "type": "object"
+      },
+      "DraftDecision": {
+        "additionalProperties": false,
+        "description": "An approve/reject decision by a named human approver.",
+        "properties": {
+          "approve": {
+            "title": "Approve",
+            "type": "boolean"
+          },
+          "reason": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "approve"
+        ],
+        "title": "DraftDecision",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "ImpactSummary": {
+        "description": "Aggregated, anonymised impact for the public view (no personal data).",
+        "properties": {
+          "causes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Causes",
+            "type": "array"
+          },
+          "donor_count": {
+            "minimum": 0.0,
+            "title": "Donor Count",
+            "type": "integer"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          },
+          "total_raised": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": [
+          "period",
+          "total_raised",
+          "donor_count"
+        ],
+        "title": "ImpactSummary",
+        "type": "object"
+      },
+      "Money": {
+        "description": "An amount in integer minor units plus an ISO-4217 currency code.\n\nFloats are never used for money (ADR-006); EUR is the default and the only\ncurrency currently supported by the pricing engine.",
+        "properties": {
+          "amount_minor": {
+            "description": "Amount in minor units (euro cents).",
+            "title": "Amount Minor",
+            "type": "integer"
+          },
+          "currency": {
+            "default": "EUR",
+            "pattern": "^[A-Z]{3}$",
+            "title": "Currency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount_minor"
+        ],
+        "title": "Money",
+        "type": "object"
+      },
+      "PageMeta": {
+        "description": "Cursor pagination metadata returned alongside a list of items.",
+        "properties": {
+          "has_more": {
+            "default": false,
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 50,
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "title": "PageMeta",
+        "type": "object"
+      },
+      "Parcel": {
+        "description": "A cemetery parcel; geometry is GeoJSON and may be withheld without consent.",
+        "properties": {
+          "cemetery_id": {
+            "title": "Cemetery Id",
+            "type": "string"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geometry"
+          },
+          "parcel_id": {
+            "title": "Parcel Id",
+            "type": "string"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "status": {
+            "pattern": "^(available|reserved|occupied|held)$",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parcel_id",
+          "cemetery_id",
+          "section",
+          "status"
+        ],
+        "title": "Parcel",
+        "type": "object"
+      },
+      "ParcelPage": {
+        "description": "A cursor-paginated page of parcels.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Parcel"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "items",
+          "page"
+        ],
+        "title": "ParcelPage",
+        "type": "object"
+      },
+      "QuoteLine": {
+        "description": "One priced line on a quote.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "quantity": {
+            "minimum": 0.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "recurring": {
+            "default": false,
+            "title": "Recurring",
+            "type": "boolean"
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": [
+          "description",
+          "unit",
+          "quantity",
+          "total"
+        ],
+        "title": "QuoteLine",
+        "type": "object"
+      },
+      "QuoteRequest": {
+        "additionalProperties": false,
+        "description": "A pricing request for one tier with optional extras.",
+        "properties": {
+          "annual_prepay": {
+            "default": false,
+            "title": "Annual Prepay",
+            "type": "boolean"
+          },
+          "extra_seats": {
+            "default": 0,
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Extra Seats",
+            "type": "integer"
+          },
+          "tier": {
+            "pattern": "^(essential|standard|premium)$",
+            "title": "Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tier"
+        ],
+        "title": "QuoteRequest",
+        "type": "object"
+      },
+      "QuoteResult": {
+        "description": "A priced quote with its totals and an optional rendered PDF reference.",
+        "properties": {
+          "grand_total": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/QuoteLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "monthly_total": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "one_off_total": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "pdf_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Url"
+          },
+          "quote_id": {
+            "title": "Quote Id",
+            "type": "string"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          },
+          "vat_total": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": [
+          "quote_id",
+          "tier",
+          "lines",
+          "one_off_total",
+          "monthly_total",
+          "vat_total",
+          "grand_total"
+        ],
+        "title": "QuoteResult",
+        "type": "object"
+      },
+      "Reservation": {
+        "description": "A stored parcel reservation.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "parcel_id": {
+            "title": "Parcel Id",
+            "type": "string"
+          },
+          "reservation_id": {
+            "title": "Reservation Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reservation_id",
+          "parcel_id",
+          "status",
+          "created_at"
+        ],
+        "title": "Reservation",
+        "type": "object"
+      },
+      "ReservationCreate": {
+        "additionalProperties": false,
+        "description": "A parcel reservation; consent is recorded server-side, never trusted here.",
+        "properties": {
+          "idempotency_key": {
+            "maxLength": 200,
+            "minLength": 8,
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "parcel_id": {
+            "title": "Parcel Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parcel_id",
+          "idempotency_key"
+        ],
+        "title": "ReservationCreate",
+        "type": "object"
+      },
+      "UtmParams": {
+        "additionalProperties": false,
+        "description": "Marketing attribution captured with the submission (kept on the CRM lead).",
+        "properties": {
+          "campaign": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campaign"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "medium": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Medium"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          }
+        },
+        "title": "UtmParams",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "ViaVitae API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/ai/audit": {
+      "get": {
+        "description": "Return the append-only approval audit trail for the tenant.",
+        "operationId": "get_audit_v1_ai_audit_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEntry"
+                  },
+                  "title": "Response Get Audit V1 Ai Audit Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Approval audit trail for the tenant.",
+        "tags": [
+          "v1",
+          "ai_pastoral"
+        ]
+      }
+    },
+    "/v1/ai/drafts": {
+      "post": {
+        "description": "Retrieve over the tenant's approved corpus and queue a cited draft.\n\nTODO(api): run guardrails.check_input, retrieve, generate via rag.llm, audit\ncitations (rag.retrieve.audit), then enqueue for approval. Nothing is\npublished here (ADR-007).",
+        "operationId": "create_draft_v1_ai_drafts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Draft"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Queue a retrieval-grounded draft.",
+        "tags": [
+          "v1",
+          "ai_pastoral"
+        ]
+      }
+    },
+    "/v1/ai/drafts/{draft_id}": {
+      "get": {
+        "description": "Fetch one draft and its citations for the resolved tenant.",
+        "operationId": "get_draft_v1_ai_drafts__draft_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "draft_id",
+            "required": true,
+            "schema": {
+              "title": "Draft Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Draft"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fetch a draft with its citations.",
+        "tags": [
+          "v1",
+          "ai_pastoral"
+        ]
+      }
+    },
+    "/v1/ai/drafts/{draft_id}/decision": {
+      "post": {
+        "description": "Record an approval/rejection by a named human (author != approver).\n\nTODO(api): delegate to app.services.approvals and append the audit record.",
+        "operationId": "decide_draft_v1_ai_drafts__draft_id__decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "draft_id",
+            "required": true,
+            "schema": {
+              "title": "Draft Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftDecision"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Draft"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve or reject a draft; the decision is audited.",
+        "tags": [
+          "v1",
+          "ai_pastoral"
+        ]
+      }
+    },
+    "/v1/assessment/": {
+      "post": {
+        "description": "Record a funnel submission, push a lead+deal to Bitrix24 (UTM kept).\n\nTODO(api): delegate to app.services.quotes_engine.recommend_tier and the\nbitrix24 mapper/sync, persist via the app.api.deps session seam, and return\nthe AssessmentResult. Routers stay thin: validate, call a service, shape.",
+        "operationId": "submit_assessment_v1_assessment__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record a completed funnel and return the recommended tier.",
+        "tags": [
+          "v1",
+          "assessment"
+        ]
+      }
+    },
+    "/v1/assessment/{assessment_id}": {
+      "get": {
+        "description": "Fetch a stored assessment scoped to the resolved tenant (RLS).",
+        "operationId": "get_assessment_v1_assessment__assessment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assessment_id",
+            "required": true,
+            "schema": {
+              "title": "Assessment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fetch a stored assessment for the current tenant.",
+        "tags": [
+          "v1",
+          "assessment"
+        ]
+      }
+    },
+    "/v1/crm/metrics": {
+      "get": {
+        "description": "Return lead/deal counts and stage conversion for the resolved tenant.\n\nTODO(api): read from the CRM sync cache (app.services.bitrix24.sync) scoped to\nthe resolved tenant; never call Bitrix24 synchronously on a dashboard hit.",
+        "operationId": "get_metrics_v1_crm_metrics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Metrics V1 Crm Metrics Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Bitrix24 pipeline snapshot for the current tenant.",
+        "tags": [
+          "v1",
+          "crm"
+        ]
+      }
+    },
+    "/v1/donations/": {
+      "post": {
+        "description": "Create a donation intent and hand off to the payment adapter.\n\nTODO(api): create the checkout via app.services.payments, store the intent\nand return the record. Idempotent on the Idempotency-Key header (ADR-005).",
+        "operationId": "create_donation_intent_v1_donations__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DonationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonationRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a one-off or recurring donation intent.",
+        "tags": [
+          "v1",
+          "donations"
+        ]
+      }
+    },
+    "/v1/donations/history": {
+      "get": {
+        "description": "Cursor-paginated donation history for the authenticated donor.",
+        "operationId": "get_history_v1_donations_history_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonationPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Donation history for the authenticated donor portal.",
+        "tags": [
+          "v1",
+          "donations"
+        ]
+      }
+    },
+    "/v1/donations/impact": {
+      "get": {
+        "description": "Public, aggregated impact figures -- never per-donor personal data.",
+        "operationId": "get_impact_v1_donations_impact_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Aggregated, anonymised impact for public reporting.",
+        "tags": [
+          "v1",
+          "donations"
+        ]
+      }
+    },
+    "/v1/gis/parcels": {
+      "get": {
+        "description": "Consent-gated parcel search; geometry is withheld without consent.",
+        "operationId": "search_parcels_v1_gis_parcels_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Search parcels by geometry, section or availability.",
+        "tags": [
+          "v1",
+          "gis"
+        ]
+      }
+    },
+    "/v1/gis/parcels/{parcel_id}": {
+      "get": {
+        "description": "Parcel detail for the resolved tenant.",
+        "operationId": "get_parcel_v1_gis_parcels__parcel_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "parcel_id",
+            "required": true,
+            "schema": {
+              "title": "Parcel Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Parcel"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Parcel detail with status history.",
+        "tags": [
+          "v1",
+          "gis"
+        ]
+      }
+    },
+    "/v1/gis/reservations": {
+      "post": {
+        "description": "Reserve a parcel, idempotent on the supplied key (ADR-005).",
+        "operationId": "reserve_parcel_v1_gis_reservations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reservation"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reserve a parcel (idempotent).",
+        "tags": [
+          "v1",
+          "gis"
+        ]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "description": "Return a shallow health signal without touching any dependency.",
+        "operationId": "health_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health V1 Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Shallow liveness signal for API clients.",
+        "tags": [
+          "v1",
+          "health"
+        ]
+      }
+    },
+    "/v1/notifications/": {
+      "post": {
+        "description": "Queue a notification for delivery.\n\nTODO(api): wire the Pydantic request/response models from\n`docs/api/v1-openapi.json` and delegate to `app/services/`.",
+        "operationId": "dispatch_v1_notifications__post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Dispatch V1 Notifications  Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Queue a notification for delivery.",
+        "tags": [
+          "v1",
+          "notifications"
+        ]
+      }
+    },
+    "/v1/notifications/{notification_id}": {
+      "get": {
+        "description": "Delivery status of a queued notification.\n\nTODO(api): wire the Pydantic request/response models from\n`docs/api/v1-openapi.json` and delegate to `app/services/`.",
+        "operationId": "get_status_v1_notifications__notification_id__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Status V1 Notifications  Notification Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Delivery status of a queued notification.",
+        "tags": [
+          "v1",
+          "notifications"
+        ]
+      }
+    },
+    "/v1/quotes/": {
+      "post": {
+        "description": "Price a tier configuration via app.services.quotes_engine.\n\nTODO(api): call quotes_engine.price_quote, render the PDF with\napp.services.pdf (WeasyPrint), push to CRM and email the quote.",
+        "operationId": "calculate_quote_v1_quotes__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuoteResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Price a configuration of products and services.",
+        "tags": [
+          "v1",
+          "quotes"
+        ]
+      }
+    },
+    "/v1/quotes/tiers": {
+      "get": {
+        "description": "List the published tiers and their price bands.\n\nTODO(api): return the tier catalogue from app.services.quotes_engine.TIERS.",
+        "operationId": "list_tiers_v1_quotes_tiers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Tiers V1 Quotes Tiers Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List tiers available for a church type.",
+        "tags": [
+          "v1",
+          "quotes"
+        ]
+      }
+    },
+    "/v1/quotes/{quote_id}/pdf": {
+      "get": {
+        "description": "Render a stored quote as a signed PDF (WeasyPrint).\n\nTODO(api): load the quote for the tenant and stream the PDF via\napp.services.pdf; sign/number it per the LT invoicing rules.",
+        "operationId": "render_quote_pdf_v1_quotes__quote_id__pdf_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quote_id",
+            "required": true,
+            "schema": {
+              "title": "Quote Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Render Quote Pdf V1 Quotes  Quote Id  Pdf Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Render a stored quote as a signed PDF.",
+        "tags": [
+          "v1",
+          "quotes"
+        ]
+      }
+    },
+    "/v1/ready": {
+      "get": {
+        "description": "Report readiness; answer 503 when the database is not reachable.",
+        "operationId": "ready_v1_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness: database reachable.",
+        "tags": [
+          "v1",
+          "health"
+        ]
+      }
+    },
+    "/v1/version": {
+      "get": {
+        "description": "Return non-sensitive build metadata for clients and dashboards.",
+        "operationId": "version_v1_version_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Version V1 Version Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Service name, version and environment.",
+        "tags": [
+          "v1",
+          "health"
+        ]
+      }
+    },
+    "/v1/webhooks/bitrix24": {
+      "post": {
+        "description": "Receive, verify and acknowledge a Bitrix24 outbound CRM event.\n\nVerification contract: match the request token against the configured\nBitrix24 webhook secret before parsing the body.",
+        "operationId": "receive_event_v1_webhooks_bitrix24_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Receive Event V1 Webhooks Bitrix24 Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Receive Event",
+        "tags": [
+          "v1",
+          "webhooks"
+        ]
+      }
+    },
+    "/v1/webhooks/bitrix24/health": {
+      "get": {
+        "description": "Confirm the Bitrix24 webhook is configured (no secret value returned).",
+        "operationId": "webhook_health_v1_webhooks_bitrix24_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Webhook Health",
+        "tags": [
+          "v1",
+          "webhooks"
+        ]
+      }
+    },
+    "/v1/webhooks/paysera": {
+      "post": {
+        "description": "Receive, verify and acknowledge a Paysera callback.\n\nVerification contract: recompute ``ss2`` over the sorted query parameters\nwith ``settings.paysera_sign_password`` and compare in constant time.",
+        "operationId": "receive_event_v1_webhooks_paysera_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Receive Event V1 Webhooks Paysera Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Receive Event",
+        "tags": [
+          "v1",
+          "webhooks"
+        ]
+      }
+    },
+    "/v1/webhooks/paysera/health": {
+      "get": {
+        "description": "Confirm the Paysera sign password is configured (no secret value returned).",
+        "operationId": "webhook_health_v1_webhooks_paysera_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Webhook Health",
+        "tags": [
+          "v1",
+          "webhooks"
+        ]
+      }
+    },
+    "/v1/webhooks/stripe": {
+      "post": {
+        "description": "Receive, verify and acknowledge a Stripe event.\n\nVerification contract (must be implemented before this endpoint is enabled):\n``stripe.Webhook.construct_event(payload, sig_header, settings.stripe_webhook_secret)``.",
+        "operationId": "receive_event_v1_webhooks_stripe_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Receive Event V1 Webhooks Stripe Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Receive Event",
+        "tags": [
+          "v1",
+          "webhooks"
+        ]
+      }
+    },
+    "/v1/webhooks/stripe/health": {
+      "get": {
+        "description": "Confirm the Stripe webhook secret is configured (no secret value returned).",
+        "operationId": "webhook_health_v1_webhooks_stripe_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Webhook Health",
+        "tags": [
+          "v1",
+          "webhooks"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.viavitae.eu/v1"
+    }
+  ]
+}

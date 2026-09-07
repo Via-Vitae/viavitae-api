@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Via-Vitae/Via-Vitae/blob/main/.github/SECURITY.md
+    about: Report privately — never open a public issue for security findings.
+  - name: Organisation documentation hub
+    url: https://github.com/Via-Vitae/viavitae-docs
+    about: GDPR records, runbooks, ADR index, SEO plan.

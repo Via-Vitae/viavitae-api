@@ -1,0 +1,47 @@
+# Public TLS ingress for the API.
+#
+# Host matches the app's prod TrustedHostMiddleware allow-list (TRUSTED_HOSTS =
+# api.viavitae.eu). The spec text mentioned api.viavitae.com, but every other
+# artefact in this repo (config, OpenAPI servers, TLS) uses viavitae.eu, so the
+# .eu host is authoritative here; change it only together with config.py.
+#
+# ingressClassName assumes the nginx ingress controller. viavitae-infra may run
+# Traefik (the k3s default); if so, translate the nginx.* annotations to their
+# Traefik middleware equivalents. Security response headers (CSP, HSTS,
+# X-Content-Type-Options) are set by the application (SecurityHeadersMiddleware)
+# and are deliberately NOT duplicated at the edge to avoid double headers.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: viavitae-api
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: viavitae
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Coarse edge rate limit; the app also enforces a per-tenant/per-key limiter
+    # (app/core/rate_limit.py). The two are complementary, not redundant.
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.viavitae.eu
+      secretName: viavitae-api-tls
+  rules:
+    - host: api.viavitae.eu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: viavitae-api
+                port:
+                  name: http

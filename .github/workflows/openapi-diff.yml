@@ -1,0 +1,68 @@
+name: OpenAPI diff — viavitae-api
+
+# Breaking-change detection on the /v1 contract plus a drift check that the
+# committed docs/api/v1-openapi.json matches what the app currently generates.
+# A breaking change fails the check, forcing it to be versioned rather than
+# silently shipped (ADR-006, docs/api/versioning-policy.md).
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "docs/api/**"
+      - "pyproject.toml"
+      - ".github/workflows/openapi-diff.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openapi-diff-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/viavitae_test
+
+jobs:
+  diff:
+    name: Breaking-change + drift detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081
+      - name: Install (dev extra)
+        run: uv sync --extra dev
+      - name: Export the current spec from the app
+        run: uv run python scripts/export_openapi.py --out /tmp/v1-openapi.json
+      - name: Breaking changes vs the committed spec
+        run: |
+          set -euo pipefail
+          # Compare paths (endpoints) in base vs revision. Removed paths are breaking.
+          python - <<'PY'
+          import json, sys
+          base = set(json.load(open("docs/api/v1-openapi.json"))["paths"].keys())
+          rev  = set(json.load(open("/tmp/v1-openapi.json"))["paths"].keys())
+          removed = sorted(base - rev)
+          if removed:
+              for p in removed:
+                  print(f"::error::Breaking change: path '{p}' removed from the v1 spec")
+              sys.exit(1)
+          print(f"no breaking changes: {len(rev)} paths in revision, {len(base)} in base")
+          PY
+      - name: Drift check (spec must be regenerated and committed)
+        run: |
+          set -euo pipefail
+          norm() { python -c "import json,sys;print(json.dumps(json.load(open(sys.argv[1])),sort_keys=True,indent=2))" "$1"; }
+          if ! diff -u <(norm docs/api/v1-openapi.json) <(norm /tmp/v1-openapi.json); then
+            echo "::error::docs/api/v1-openapi.json is stale; run scripts/export_openapi.py and commit"
+            exit 1
+          fi

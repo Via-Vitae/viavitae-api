@@ -1,0 +1,61 @@
+name: Bug report
+description: Report something that is broken or behaves unexpectedly
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do **not** use this form for security vulnerabilities.
+        Report those privately via `SECURITY.md`.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, in one or two sentences?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Numbered, minimal steps. Include the environment (dev/staging/prod).
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include logs, stack traces or screenshots. Redact personal data.
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: ["Critical — production down or data exposure", "High", "Medium", "Low"]
+    validations:
+      required: true
+  - type: dropdown
+    id: locale
+    attributes:
+      label: Locale affected
+      multiple: true
+      options: ["lt", "en", "ru", "pl (stub)", "de (stub)", "all", "not locale specific"]
+  - type: checkboxes
+    id: data
+    attributes:
+      label: Personal data
+      options:
+        - label: This issue involves or exposes personal data
+          required: false

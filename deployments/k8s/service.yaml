@@ -1,0 +1,21 @@
+# Cluster-internal Service for the API. The ingress terminates TLS and forwards
+# here; the service itself is not exposed on a node port or load balancer.
+apiVersion: v1
+kind: Service
+metadata:
+  name: viavitae-api
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: viavitae
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

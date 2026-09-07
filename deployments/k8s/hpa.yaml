@@ -1,0 +1,47 @@
+# Horizontal autoscaler for the API Deployment.
+#
+# Requires the resource requests declared in deployment.yaml. Scale-down is
+# dampened (5-minute stabilisation) so a brief traffic dip does not evict pods
+# mid-request; scale-up reacts within a minute to absorb bursts.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: viavitae-api
+  namespace: viavitae
+  labels:
+    app.kubernetes.io/name: viavitae-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: viavitae
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: viavitae-api
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60

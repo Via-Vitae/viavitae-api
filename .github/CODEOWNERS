@@ -1,0 +1,50 @@
+# CODEOWNERS — viavitae-api ownership mapping
+#
+# Rule R2: This file is never empty. The '*' rule always resolves to at least
+# @Via-Vitae/architects. Changes that remove owners or widen '*' require
+# approval from @Via-Vitae/compliance.
+
+# --- Default owner -----------------------------------------------------------
+*                                       @Via-Vitae/architects
+
+# --- Platform: CI/CD and workflows ------------------------------------------
+/.github/                               @Via-Vitae/platform @Via-Vitae/architects
+/.github/workflows/                     @Via-Vitae/platform @Via-Vitae/security
+/.github/CODEOWNERS                     @Via-Vitae/architects @Via-Vitae/compliance
+/.github/dependabot.yml                 @Via-Vitae/platform
+
+# --- Application source ------------------------------------------------------
+/app/                                   @Via-Vitae/architects @Via-Vitae/security
+/app/api/v1/webhooks/                   @Via-Vitae/security @Via-Vitae/architects
+/app/core/config.py                     @Via-Vitae/architects @Via-Vitae/security
+/app/core/tenancy.py                    @Via-Vitae/architects @Via-Vitae/security
+/app/db/                                @Via-Vitae/architects @Via-Vitae/security
+
+# --- Compliance and privacy --------------------------------------------------
+/docs/                                  @Via-Vitae/architects @Via-Vitae/compliance
+/docs/DPIA-*.md                         @Via-Vitae/compliance @Via-Vitae/dpo
+/docs/architecture.md                   @Via-Vitae/architects @Via-Vitae/compliance
+
+# --- Legal and policy --------------------------------------------------------
+/LICENSE                                @Via-Vitae/legal @Via-Vitae/architects
+/SECURITY.md                            @Via-Vitae/security @Via-Vitae/legal
+/CONTRIBUTING.md                        @Via-Vitae/architects
+/QODER.md                               @Via-Vitae/architects @Via-Vitae/security
+/CHANGELOG.md                           @Via-Vitae/architects
+/README.md                              @Via-Vitae/architects
+
+# --- Dependencies and packaging ----------------------------------------------
+/pyproject.toml                         @Via-Vitae/architects @Via-Vitae/security
+/uv.lock                                @Via-Vitae/architects
+/alembic.ini                            @Via-Vitae/architects
+
+# --- Infrastructure and deployment -------------------------------------------
+/Dockerfile                             @Via-Vitae/platform @Via-Vitae/security
+/docker-compose.yml                     @Via-Vitae/platform
+/deployments/                           @Via-Vitae/platform @Via-Vitae/security
+
+# --- Tests and quality -------------------------------------------------------
+/tests/                                 @Via-Vitae/architects
+/tests/security/                        @Via-Vitae/security @Via-Vitae/architects
+/tests/isolation/                       @Via-Vitae/security @Via-Vitae/architects
+/tests/contract/                        @Via-Vitae/architects @Via-Vitae/security

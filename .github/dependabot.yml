@@ -1,0 +1,44 @@
+# Organisation-wide update policy (weekly, grouped).
+# Canonical copy lives in `Via-Vitae/.github/dependabot.yml`; keep this file in sync.
+version: 2
+updates:
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Vilnius"
+    open-pull-requests-limit: 10
+    groups:
+      github_actions_minor_patch:
+        update-types: ["minor", "patch"]
+      github_actions_security:
+        applies-to: security-updates
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    labels:
+      - "dependencies"
+      - "eu-compliance-review"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Vilnius"
+    open-pull-requests-limit: 10
+    groups:
+      pip_minor_patch:
+        update-types: ["minor", "patch"]
+      pip_security:
+        applies-to: security-updates
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    labels:
+      - "dependencies"
+      - "eu-compliance-review"

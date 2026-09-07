@@ -1,0 +1,20 @@
+Copyright (c) 2026 ViaVitae (viavitae-org) — viavitae-api
+
+ALL RIGHTS RESERVED.
+
+This repository contains proprietary source code, design assets and
+documentation of ViaVitae. Until an open-source licence is selected and recorded
+in `docs/architecture.md` (ADR), the following terms apply:
+
+1. Use. Organisation members and contracted partners may use, build and run the
+   contents of this repository for ViaVitae business purposes only.
+2. Copying. Copying, redistribution, sublicensing or sale of any part of this
+   repository outside the ViaVitae organisation is prohibited without prior
+   written consent.
+3. Contributions. Contributions submitted to this repository are made available
+   to ViaVitae under the same terms (see CONTRIBUTING.md).
+4. Third-party components. Third-party components keep their own licence; see
+   the licence report produced by `.github/workflows/compliance-check.yml`.
+
+TODO(architects): replace this placeholder with the chosen SPDX licence before
+the first public or client-facing release.

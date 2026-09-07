@@ -1,0 +1,57 @@
+# Files excluded from the Docker build context. The builder stage needs only
+# pyproject.toml, uv.lock, README.md, app/, and alembic.ini; everything else
+# bloats the context and can accidentally leak into the image.
+
+# Version control and editor metadata
+.git
+.gitignore
+.github
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Python caches and artefacts
+__pycache__
+*.py[cod]
+*.egg-info
+.venv
+.venv-*
+.mypy_cache
+.ruff_cache
+.pytest_cache
+.coverage
+coverage.xml
+htmlcov
+dist
+build
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Testing and CI artefacts
+junit.xml
+.tox
+.nox
+
+# Staging directories used by this workspace (never ship the workspace itself)
+.api-staging
+.api-verify-venv
+.brand-probe-venv
+.vvweb-staging
+
+# Documentation that is not needed in the image
+docs
+*.md
+!README.md
+
+# Deployments and scripts are operator tooling, not runtime
+deployments
+scripts
+
+# OS files
+.DS_Store
+Thumbs.db

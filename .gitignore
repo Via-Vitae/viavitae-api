@@ -1,0 +1,140 @@
+# viavitae-template .gitignore
+# Node + Python + Terraform superset. Every repository generated from this template
+# starts here and trims the sections that do not apply to its stack.
+#
+# Never un-ignore a secret, key, state file or environment file. If a value must be
+# committed, it is not a secret and belongs in documentation or a schema.
+
+# --- Secrets and credentials -------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+secrets/
+.secrets.baseline
+*.tfvars
+!*.auto.tfvars.example
+
+# --- Terraform and infrastructure state --------------------------------------
+# State can contain credentials and resource identifiers in plaintext.
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage/
+coverage.xml
+htmlcov/
+junit.xml
+*.egg-info/
+.eggs/
+build/
+dist/
+wheels/
+pip-wheel-metadata/
+.cache/
+
+# --- Node and frontend -------------------------------------------------------
+node_modules/
+.next/
+out/
+.nuxt/
+.svelte-kit/
+.turbo/
+.npm/
+.yarn/
+.pnp.*
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.vite/
+
+# --- Build artefacts ---------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Test and tooling output -------------------------------------------------
+playwright-report/
+test-results/
+k6-summary.json
+*.lcov
+
+# --- Editors and IDEs --------------------------------------------------------
+# Shared run configurations are the one part of .idea/ worth committing.
+.idea/*
+!.idea/runConfigurations/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# --- Operating systems -------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Archives and large binaries ---------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.dmg
+*.iso
+
+# --- Local staging directories and scratch venvs -----------------------------
+# These are temporary staging areas for generation runs targeting sibling repos.
+# They must never be committed to the template. Delete after migration.
+/.api-staging/
+/.demos-staging/
+/.infra-staging/
+/.api-verify-venv/
+/.infra-verify-venv/
+/.infra-tools/
+/.qoder/
+/.viavitae-*-spec.md

@@ -1,0 +1,17 @@
+{
+  "id": "evt_test_checkout_1",
+  "object": "event",
+  "type": "checkout.session.completed",
+  "api_version": "2024-09-30.acacia",
+  "livemode": false,
+  "data": {
+    "object": {
+      "id": "cs_test_1",
+      "object": "checkout.session",
+      "amount_total": 5000,
+      "currency": "eur",
+      "payment_status": "paid",
+      "metadata": { "tenant": "anne", "order_id": "ord_1" }
+    }
+  }
+}
