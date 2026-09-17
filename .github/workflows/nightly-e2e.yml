@@ -1,9 +1,12 @@
 name: Nightly E2E — viavitae-api
 
-# Boots the compose stack, runs the repo-local k6 smoke and then the shared
-# Playwright suite from viavitae-qa. Cross-repo assets are fetched with an
-# explicit checkout into a subdirectory -- never a `../viavitae-qa` path, which
-# only resolves inside the old monorepo and silently no-ops elsewhere.
+# Boots the compose stack and runs the repo-local k6 smoke test.
+#
+# The shared Playwright suite from viavitae-qa is NOT run here because it
+# requires the full pnpm workspace (workspace:* dependencies) and the web
+# (port 3000) and demo (port 3001) services, which are not part of the API
+# compose stack. Playwright E2E is covered by viavitae-qa's own nightly
+# workflow which boots the full stack.
 
 on:
   schedule:
@@ -22,7 +25,7 @@ env:
 
 jobs:
   e2e:
-    name: k6 smoke + Playwright
+    name: k6 smoke
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -39,36 +42,6 @@ jobs:
         run: >-
           docker run --rm --network host -v "$PWD":/k6
           grafana/k6 run /k6/deployments/k6/smoke.js
-
-      # A read token scoped to viavitae-qa is required when that repo is private;
-      # the default GITHUB_TOKEN only reaches public repos in the org.
-      - name: Check out viavitae-qa
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          repository: Via-Vitae/viavitae-qa
-          path: .viavitae-qa
-
-      - name: Set up Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install Playwright
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip playwright pytest
-          python -m playwright install --with-deps chromium
-
-      - name: Run the shared Playwright suite
-        env:
-          API_BASE_URL: http://localhost:8000
-        run: |
-          set -euo pipefail
-          if [ -d .viavitae-qa/e2e ]; then
-            python -m pytest .viavitae-qa/e2e -q
-          else
-            echo "::warning::viavitae-qa exposes no e2e/ suite yet; nothing to run"
-          fi
 
       - name: Tear down
         if: always()
