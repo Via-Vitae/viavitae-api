@@ -10,9 +10,9 @@ issue or pull request.
 
 | Channel | Detail |
 | --- | --- |
-| Email | `security@viavitae.eu` |
+| Email | `journey4oflife+viavitae.security@gmail.com` |
 | GitHub | *Security → Report a vulnerability* (private vulnerability reporting enabled) |
-| PGP | Key published at `https://viavitae.eu/.well-known/pgp-key.txt` |
+| PGP | Not published yet — use GitHub private vulnerability reporting |
 
 Include: affected repository and version/commit, steps to reproduce, impact,
 and whether the finding is already public.
