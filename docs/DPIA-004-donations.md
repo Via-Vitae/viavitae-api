@@ -60,21 +60,27 @@ Data subjects, volume, sources, systems and sub-processors:
 
 | # | Risk | Measure | Type | Residual risk | Owner | Due |
 | --- | --- | --- | --- | --- | --- | --- |
-| M1 | R1 | Row-level security on every table; `SET app.tenant_id` enforced by middleware | Technical | Low | ViaVitae | Go-live |
-| M2 | R2 | Idempotency ledger (ADR-005); webhook signature verification (fail-closed) | Technical | Low | ViaVitae | Go-live |
-| M3 | R3 | Structured logging excludes payment tokens and card data; `bandit` SAST in CI | Organisational | Low | ViaVitae | Go-live |
-| M4 | R4 | Retention cron job (`app/workers/retention_worker.py`); annual DPO review | Organisational | Low | DPO | Q1 after go-live |
+| M1 | R1 | Row-level security on every table; tenant GUC set in code. **STATUS 2026-10-27: PARTIALLY IMPLEMENTED** — `app/db/session.py` does set `app.tenant_id`, but `app/db/migrations/versions/` contains only `.gitkeep` (zero Alembic revisions) and the image never runs `alembic upgrade head`, so no tables and no RLS policies exist; `tests/isolation/*` are skipped TODOs (VV-2026-10-016). The `Low` rating is therefore **not evidenced** | Technical | **Not evidenced** | ViaVitae | Go-live |
+| M2 | R2 | Idempotency ledger (ADR-005); webhook signature verification (fail-closed). **STATUS 2026-10-27: NOT IMPLEMENTED** — the handlers are `501` stubs and neither ledger table exists, so this measure does not yet reduce R2 and the `Low` residual rating is **unsupported by evidence** (DPO must re-rate before go-live) | Technical | **Not evidenced** | ViaVitae | Go-live |
+| M3 | R3 | Structured logging excludes payment tokens and card data — **verified real**: a `_redact` processor over secret-named keys in `app/core/logging.py`. SAST in CI — **tool corrected**: the `sast` job runs **Semgrep** (`p/security-audit`, `p/secrets`, `p/owasp-top-ten`) and a Trivy filesystem scan runs in `dependency-scan`; `bandit` is only a declared dev dependency, not a CI gate | Organisational | Low | ViaVitae | Go-live |
+| M4 | R4 | Retention cron job — **STATUS 2026-10-27: NOT IMPLEMENTED** — the cited `app/workers/retention_worker.py` does not exist (that directory holds `demo_reset`, `followups`, `index_worker`, `queue`, `reconciliation_worker`). The annual DPO review is a process commitment, not a control in code | Organisational | **Not evidenced** | DPO | Q1 after go-live |
 
-Baseline already in place: TLS 1.3, encryption at rest, RBAC, tenant RLS,
-audit logging, idempotency, EU residency, incident runbook, DSR procedure.
+Baseline claimed in place: TLS 1.3, encryption at rest, RBAC, tenant RLS,
+audit logging, EU residency, incident runbook, DSR procedure.
+**Correction (2026-10-27):** *idempotency* was listed here but is **not** in
+place — it is the unimplemented M2 above. Read from the code, not from the
+docstrings: `app/api/v1/webhooks/*.py` all raise `501 not_implemented`.
 
 ## 5. Consultation
 
 - Data subjects / representatives: _donors informed via the controller's
   privacy notice at the point of donation_
 - Processor: ViaVitae (DPA signed)
-- Art. 36 prior consultation required? No — measures reduce residual risk to
-  low for all identified risks.
+- Art. 36 prior consultation required? **Unresolved — re-assess.** The original
+  answer was "No", justified by "measures reduce residual risk to low for all
+  identified risks"; that premise fails for R2, whose only mitigation (M2) is not
+  implemented. The conclusion itself is a legal determination for the DPO, not an
+  engineering one (GDPR Art. 35(7)(d), Art. 36).
 
 ## 6. Outcome and sign-off
 

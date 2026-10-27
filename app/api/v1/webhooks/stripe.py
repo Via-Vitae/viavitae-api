@@ -1,9 +1,13 @@
-"""Stripe webhook: signature verified, idempotent on event id (ADR-005).
+"""Stripe webhook: fail-closed STUB — processing is not implemented (ADR-005).
 
-Fail-closed by design: an event that cannot be verified is never acknowledged
-with 2xx, because acknowledging tells Stripe to stop retrying and would silently
-drop a real payment event. Unverified/unsigned events are rejected so the
-provider keeps retrying until the handler is correctly implemented and keyed.
+Signature verification and the idempotency ledger are the contract to
+implement, not current behavior: every request that passes the input guards is
+refused with 501 ``not_implemented``, so nothing is ever processed or
+acknowledged. Fail-closed by design: an event that cannot be verified is never
+acknowledged with 2xx, because acknowledging tells Stripe to stop retrying and
+would silently drop a real payment event. Unverified/unsigned events are
+rejected so the provider keeps retrying until the handler is correctly
+implemented and keyed.
 """
 
 from __future__ import annotations
@@ -29,9 +33,9 @@ async def receive_event(
     response: Response,
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict[str, str]:
-    """Receive, verify and acknowledge a Stripe event.
+    """Refuse a Stripe event without processing it (stub).
 
-    Verification contract (must be implemented before this endpoint is enabled):
+    Verification contract to implement before this endpoint may return 2xx:
     ``stripe.Webhook.construct_event(payload, sig_header, settings.stripe_webhook_secret)``.
     """
     signature = request.headers.get("stripe-signature")

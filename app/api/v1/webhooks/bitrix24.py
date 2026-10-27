@@ -1,8 +1,11 @@
-"""Bitrix24 event webhook: token verified, idempotent on event id.
+"""Bitrix24 event webhook: fail-closed STUB — processing is not implemented.
 
 Bitrix24 outbound events are authenticated with the integration token/secret
-embedded in the webhook URL. Fail-closed: an event without a verifiable token is
-rejected rather than acted upon, so a forged CRM event cannot mutate local state.
+embedded in the webhook URL. That verification and event-id idempotency (see
+ADR-005) are the contract to implement, not current behavior: every request
+that passes the input guards is refused with 501 ``not_implemented``.
+Fail-closed: an event without a verifiable token is rejected rather than acted
+upon, so a forged CRM event cannot mutate local state.
 """
 
 from __future__ import annotations
@@ -28,10 +31,11 @@ async def receive_event(
     response: Response,
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict[str, str]:
-    """Receive, verify and acknowledge a Bitrix24 outbound CRM event.
+    """Refuse a Bitrix24 outbound CRM event without processing it (stub).
 
-    Verification contract: match the request token against the configured
-    Bitrix24 webhook secret before parsing the body.
+    Verification contract to implement before this endpoint may return 2xx:
+    match the request token against the configured Bitrix24 webhook secret
+    before parsing the body.
     """
     token = request.headers.get("x-bitrix-token") or request.query_params.get("token")
     if not token:

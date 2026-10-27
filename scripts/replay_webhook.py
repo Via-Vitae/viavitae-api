@@ -5,8 +5,9 @@ Backs ``docs/runbooks/webhook-replay.md``. Given a provider and an event id it
 prints the exact, signature-aware ``curl`` invocation an operator uses to
 re-deliver an event to the local endpoint. It never fabricates a signature: the
 real signature must come from the provider (its dashboard, or the stored raw
-payload plus the signing secret). Because handlers are idempotent on the event id
-(ADR-005), a replay never double-applies a payment or a CRM change.
+payload plus the signing secret). Status (ADR-005 is the target design): the
+handlers are fail-closed stubs that refuse every event with 501, so today a
+replay can neither double-apply nor apply anything.
 
 The idempotency ledger is not yet persisted, so this tool prints the procedure
 and command template rather than reading a stored payload.

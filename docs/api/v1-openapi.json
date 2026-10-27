@@ -1206,7 +1206,7 @@
     },
     "/v1/gis/reservations": {
       "post": {
-        "description": "Reserve a parcel, idempotent on the supplied key (ADR-005).",
+        "description": "STUB: refuses with NotImplementedError; nothing is reserved.\n\nTarget contract (ADR-005, not implemented): idempotent on the supplied key,\nbacked by the ``idempotency_key`` ledger that does not exist yet.",
         "operationId": "reserve_parcel_v1_gis_reservations_post",
         "requestBody": {
           "content": {
@@ -1240,7 +1240,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Reserve a parcel (idempotent).",
+        "summary": "Reserve a parcel (STUB — returns 501).",
         "tags": [
           "v1",
           "gis"
@@ -1488,7 +1488,7 @@
     },
     "/v1/webhooks/bitrix24": {
       "post": {
-        "description": "Receive, verify and acknowledge a Bitrix24 outbound CRM event.\n\nVerification contract: match the request token against the configured\nBitrix24 webhook secret before parsing the body.",
+        "description": "Refuse a Bitrix24 outbound CRM event without processing it (stub).\n\nVerification contract to implement before this endpoint may return 2xx:\nmatch the request token against the configured Bitrix24 webhook secret\nbefore parsing the body.",
         "operationId": "receive_event_v1_webhooks_bitrix24_post",
         "parameters": [
           {
@@ -1564,7 +1564,7 @@
     },
     "/v1/webhooks/paysera": {
       "post": {
-        "description": "Receive, verify and acknowledge a Paysera callback.\n\nVerification contract: recompute ``ss2`` over the sorted query parameters\nwith ``settings.paysera_sign_password`` and compare in constant time.",
+        "description": "Refuse a Paysera callback without processing it (stub).\n\nVerification contract to implement before this endpoint may return 2xx:\nrecompute ``ss2`` over the sorted query parameters with\n``settings.paysera_sign_password`` and compare in constant time.",
         "operationId": "receive_event_v1_webhooks_paysera_post",
         "parameters": [
           {
@@ -1640,7 +1640,7 @@
     },
     "/v1/webhooks/stripe": {
       "post": {
-        "description": "Receive, verify and acknowledge a Stripe event.\n\nVerification contract (must be implemented before this endpoint is enabled):\n``stripe.Webhook.construct_event(payload, sig_header, settings.stripe_webhook_secret)``.",
+        "description": "Refuse a Stripe event without processing it (stub).\n\nVerification contract to implement before this endpoint may return 2xx:\n``stripe.Webhook.construct_event(payload, sig_header, settings.stripe_webhook_secret)``.",
         "operationId": "receive_event_v1_webhooks_stripe_post",
         "parameters": [
           {
