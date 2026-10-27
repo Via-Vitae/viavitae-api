@@ -83,6 +83,12 @@ not priority ranks.
   days; replays return the stored result with `200` and `Idempotent-Replayed: true`.
 - **Consequences:** Safe retries, exactly-once side effects. Adds a table and a
   dependency; keys must be validated for reuse with a different payload (`409`).
+- **Implementation status (read from the code 2026-10-27): NOT IMPLEMENTED.**
+  The Stripe/Paysera/Bitrix24 handlers raise `501 not_implemented`, no
+  `webhook_event` or `idempotency_key` table or migration exists, and the
+  donation/GIS money endpoints are scaffolds. Until the ledger and handlers
+  land, this ADR is a contract to build — any runbook, docstring or QODER.md
+  line that describes replay safety in the present tense is inaccurate.
 
 ### ADR-006 — Error envelope and versioning
 

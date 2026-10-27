@@ -31,8 +31,12 @@ async def get_parcel(parcel_id: str) -> Parcel:
     "/reservations",
     response_model=Reservation,
     status_code=status.HTTP_201_CREATED,
-    summary="Reserve a parcel (idempotent).",
+    summary="Reserve a parcel (STUB — returns 501).",
 )
 async def reserve_parcel(body: ReservationCreate) -> Reservation:
-    """Reserve a parcel, idempotent on the supplied key (ADR-005)."""
+    """STUB: refuses with NotImplementedError; nothing is reserved.
+
+    Target contract (ADR-005, not implemented): idempotent on the supplied key,
+    backed by the ``idempotency_key`` ledger that does not exist yet.
+    """
     raise NotImplementedError("reserve_parcel is scaffolded but not implemented")

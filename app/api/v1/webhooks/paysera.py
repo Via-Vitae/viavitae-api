@@ -1,9 +1,11 @@
-"""Paysera callback: SS2 signature verified, idempotent on order id (ADR-005).
+"""Paysera callback: fail-closed STUB — processing is not implemented (ADR-005).
 
 Paysera posts a callback whose integrity is protected by an ``ss2`` HMAC-style
 digest computed over the ordered query parameters with the project sign
-password. Fail-closed: without a verifiable signature the callback is rejected,
-never acknowledged.
+password. That verification and the order-id idempotency ledger are the
+contract to implement, not current behavior: every request that passes the
+input guards is refused with 501 ``not_implemented``. Fail-closed: without a
+verifiable signature the callback is rejected, never acknowledged.
 """
 
 from __future__ import annotations
@@ -29,10 +31,11 @@ async def receive_event(
     response: Response,
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict[str, str]:
-    """Receive, verify and acknowledge a Paysera callback.
+    """Refuse a Paysera callback without processing it (stub).
 
-    Verification contract: recompute ``ss2`` over the sorted query parameters
-    with ``settings.paysera_sign_password`` and compare in constant time.
+    Verification contract to implement before this endpoint may return 2xx:
+    recompute ``ss2`` over the sorted query parameters with
+    ``settings.paysera_sign_password`` and compare in constant time.
     """
     signature = request.query_params.get("ss2") or request.headers.get("x-paysera-signature")
     if not signature:

@@ -184,16 +184,21 @@ CREATE POLICY tenant_isolation ON <table>
 Queries without a tenant context are rejected by the repository helpers
 (`app/core/tenancy.py`).
 
-## Idempotency ledger (ADR-005)
+## Idempotency ledger (ADR-005) — DESIGN ONLY, NOT IMPLEMENTED
 
-Two tables back the idempotency surface:
+**Status (read from the code on 2026-10-27):** neither table below exists.
+`app/models/webhook_event.py` holds a TODO comment and no ORM model, there is no
+migration for it, and the webhook handlers refuse every event with `501`. So
+today nothing is stored, no replay is deduplicated, and no `409` path exists.
 
-- **`webhook_event`** — stores every verified provider event by
-  `(provider, provider_event_id)` with a unique constraint. A replayed
+Target design — two tables would back the idempotency surface:
+
+- **`webhook_event`** — would store every verified provider event by
+  `(provider, provider_event_id)` with a unique constraint, so a replayed
   delivery returns the stored result instead of re-running side effects.
-- **`idempotency_key`** — stores client-supplied `Idempotency-Key` headers
-  for money-moving endpoints. Keys expire after 30 days. A replayed key with
-  a different `request_hash` returns `409 Conflict`.
+- **`idempotency_key`** — would store client-supplied `Idempotency-Key` headers
+  for money-moving endpoints. Keys would expire after 30 days and a replayed key
+  with a different `request_hash` would return `409 Conflict`.
 
 ## AI / RAG tables (DPIA-002)
 

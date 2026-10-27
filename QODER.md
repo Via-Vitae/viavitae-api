@@ -5,7 +5,7 @@ They complement, and never override, `CONTRIBUTING.md` and `SECURITY.md`.
 
 ## 1. What this repository is
 
-Backend services (Python 3.12 + FastAPI): assessment funnel, pricing engine and PDF quotes, idempotent payment/CRM webhooks, donations and impact aggregation, the RAG-based AI pastoral assistant with a human approval queue, cemetery GIS, and notification dispatch. PostgreSQL, tenant-scoped, EU-resident.
+Backend services (Python 3.12 + FastAPI): assessment funnel, pricing engine and PDF quotes, payment/CRM webhooks (**fail-closed stubs — ADR-005 idempotency is the target design, not implemented**), donations and impact aggregation, the RAG-based AI pastoral assistant with a human approval queue, cemetery GIS, and notification dispatch. PostgreSQL, tenant-scoped, EU-resident.
 
 ## 2. Commands
 

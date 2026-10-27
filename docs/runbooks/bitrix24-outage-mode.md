@@ -56,9 +56,11 @@ Symptoms:
 
 ## Data consistency notes
 
-- All CRM writes are idempotent (ADR-005): the outbox entries carry the
-  provider event id as the idempotency key, so a replay after recovery never
-  creates duplicate contacts or deals.
+- **CRM idempotency is target design (ADR-005), not current behavior.** The
+  Bitrix24 webhook handler is a fail-closed 501 stub and no idempotency ledger
+  exists, so today no CRM write is applied — and none is deduplicated. Once the
+  ledger lands, outbox entries carry the provider event id as the idempotency
+  key so a replay after recovery never creates duplicate contacts or deals.
 - The outbox is bounded by Redis memory; under normal load the queue holds
   days of events. If the outage is expected to last > 24 h, consider
   increasing Redis memory or enabling the `BITRIX24_OUTAGE_MODE=reject`

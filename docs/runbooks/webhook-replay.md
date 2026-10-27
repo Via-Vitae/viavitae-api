@@ -1,8 +1,12 @@
 # Runbook — Webhook replay
 
-> Backs `scripts/replay_webhook.py`. All webhook handlers are idempotent on the
-> provider event id (ADR-005), so a replay never double-applies a payment or a
-> CRM change.
+> Backs `scripts/replay_webhook.py`. **STATUS: the webhook handlers are
+> fail-closed stubs (ADR-005 is the target design, not current behavior).**
+> They refuse every event with 501 and no idempotency ledger exists yet, so a
+> replay cannot double-apply anything today — and cannot apply the event
+> either. The response table and safety properties below activate only when
+> signature verification, the ledger and processing land together with real
+> replay-idempotency tests.
 
 ## When to use
 
@@ -65,8 +69,10 @@ Run the printed `curl` command. Expected responses:
 
 - The script **never** fabricates a signature. A real signature from the
   provider is required — this is fail-closed by design (ADR-005).
-- Because handlers are idempotent, running the same replay twice is safe: the
-  second run returns the stored result.
+- Handlers are not yet idempotent because they are not yet implemented: today
+  every replay attempt is refused (501). Once processing lands, running the
+  same replay twice must return the stored result — pinned by the
+  replay-idempotency tests required before this runbook becomes actionable.
 - If the idempotency ledger entry has expired (30-day TTL), the event is
   re-processed from scratch. Verify that money-moving side effects (receipts,
   CRM contacts) are themselves idempotent at the provider.

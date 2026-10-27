@@ -1,8 +1,10 @@
-"""Webhook events and the idempotency ledger (ADR-005).
+"""Webhook events and the idempotency ledger (ADR-005) — DESIGN ONLY.
 
-Stores every verified provider event by its provider event id so a replayed
-delivery is acknowledged from the stored result instead of re-running side
-effects, plus client ``Idempotency-Key`` records for money-moving endpoints.
+Planned behavior: store every verified provider event by its provider event id
+so a replayed delivery is acknowledged from the stored result instead of
+re-running side effects, plus client ``Idempotency-Key`` records for
+money-moving endpoints. NOT IMPLEMENTED: the ORM models and migrations below
+do not exist yet, so no replay is deduplicated anywhere in the app today.
 """
 
 from __future__ import annotations
