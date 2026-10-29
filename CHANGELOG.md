@@ -6,6 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Security hardening
+- Reject missing or malformed trusted tenant claims outside development; client headers and host names cannot select a tenant in staging or production.
+
+
 ### Added
 - Initial repository scaffold generated from the `Via-Vitae` organisation blueprint.
 

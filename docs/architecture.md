@@ -125,3 +125,21 @@ not priority ranks.
 | Backups | Nightly with `wal-g`, restore drills documented in `viavitae-docs` |
 | Accessibility | WCAG 2.2 AA, `axe` in CI, keyboard-first components |
 | i18n | `lt`, `en`, `ru` supported; `pl`, `de` stubbed |
+
+
+## Tenant identity gate (2026-10-29)
+
+Staging and production require a nonempty trusted `request.state.tenant_claim`.
+The `X-Tenant` header and host fallback are development-only. Missing trusted
+identity returns HTTP 401 using the standard error envelope, before the service
+handler executes. This closes the client-controlled tenant fallback; it does not
+implement authentication. A future trusted middleware must validate token
+signature, issuer, audience, expiry and membership before setting this state.
+Never populate it by copying an unverified header or decoded token. Until that
+middleware is implemented, tenant-dependent routes remain closed outside dev.
+Set `ENVIRONMENT=staging` or `prod` explicitly in deployments (default is dev).
+No new personal-data processing or external vendor is introduced by this change.
+
+All pastoral AI routes now require the tenant dependency. Other scaffolded routers
+still need explicit authentication and resource-level authorization as they are
+implemented; this patch does not claim to secure every API route.

@@ -7,11 +7,16 @@ without a named human approval" invariant explicit in the API surface.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
+from app.api.deps import get_current_tenant
 from app.schemas.ai import AuditEntry, Draft, DraftCreate, DraftDecision
 
-router = APIRouter(tags=["ai_pastoral"])
+router = APIRouter(
+    tags=["ai_pastoral"],
+    dependencies=[Depends(get_current_tenant)],
+    responses={401: {"description": "A verified tenant identity is required outside development."}},
+)
 
 
 @router.post(
