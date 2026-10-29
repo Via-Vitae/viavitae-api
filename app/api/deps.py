@@ -16,6 +16,8 @@ from typing import Annotated
 from fastapi import Depends, Header, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+from app.core.errors import ApiError
 from app.core.tenancy import TenantContext, resolve_tenant
 from app.db.session import get_session, ping
 
@@ -33,16 +35,27 @@ async def database_ready() -> bool:
 
 def get_current_tenant(
     request: Request,
-    x_tenant: str | None = Header(default=None, alias="X-Tenant"),
+    x_tenant: str | None = Header(
+        default=None, alias="X-Tenant", description="Development-only tenant fallback."
+    ),
 ) -> TenantContext:
     """Resolve the tenant from the authenticated context, never from the body.
 
     An unresolvable tenant raises ``InvalidTenantError`` which the error handlers
     render as a 400 envelope.
     """
-    # TODO(api): prefer a verified Keycloak JWT claim over the header/subdomain;
-    #            the X-Tenant header is a dev fallback and must be disabled in prod.
+    # Only authentication middleware may populate tenant_claim after verifying
+    # signature, issuer, audience, expiry and tenant membership. Until that
+    # middleware exists, non-development tenant routes intentionally refuse access.
     claim: str | None = getattr(request.state, "tenant_claim", None)
+    if settings.environment != "dev":
+        if not isinstance(claim, str) or not claim.strip():
+            raise ApiError(
+                "authentication_required",
+                "A verified tenant identity is required.",
+                status_code=401,
+            )
+        return resolve_tenant(jwt_claim=claim)
     return resolve_tenant(jwt_claim=claim or x_tenant, host=request.url.hostname)
 
 
